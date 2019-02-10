@@ -1,0 +1,22 @@
+{
+    "name": "BitBucket release notes",
+    "version": "1.0",
+    "description": "BitBucket release notes generator",
+    "manifest_version": 2,
+    "background": {
+        "scripts": [
+            "background.js",
+            "jquery-3.3.1.min.js"
+        ],
+        "persistent": false
+    },
+    "page_action": {
+        "default_popup": "popup.html",
+        "default_icon": "note.png"
+    },
+    "permissions": [
+        "activeTab",
+        "storage",
+        "declarativeContent"
+    ]
+}
