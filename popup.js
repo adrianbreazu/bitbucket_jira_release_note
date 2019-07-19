@@ -1,18 +1,23 @@
 let btn_generate = document.getElementById('btn-generate');
+var input_latest_records_element = document.getElementById('latest-records');
 
-chrome.storage.sync.get('color', function(data) {
-    btn_generate.style.backgroundColor = data.color;
-    btn_generate.setAttribute('value', data.color);
-});
 
 btn_generate.onclick = function(element) {
-    function extractDOM() {
+    var value = input_latest_records_element.value;
+
+    function extractDOM(input_latest_records) {
         let json_data = {}
         var data_commit = document.querySelectorAll('tr.commit-row');
         var array_data = [];
         var data_dict = {};
         var obj = {};
-        for (var i = 0; i < data_commit.length; i++) {
+        var number_of_records = 0;
+
+        if (typeof(input_latest_records) !== 'undefined' && input_latest_records > 0)
+            number_of_records = input_latest_records;
+        else
+            number_of_records = data_commit.length;
+        for (var i = 0; i < number_of_records; i++) {
             //reset array data and obj
             array_data = [];
             obj = {};
@@ -23,7 +28,12 @@ btn_generate.onclick = function(element) {
 
             // extract href and text
             var commit_text = data_commit[i].querySelector('td.message');
-            commit_text = commit_text.querySelector('span.message-subject').lastChild;
+            // see if message-body is populated else read from messge-subject
+            var element = commit_text.querySelector('span.message-body').lastChild;
+            if (typeof(element) != 'undefined' && element != null)
+                commit_text = commit_text.querySelector('span.message-body').lastChild;
+            else
+                commit_text = commit_text.querySelector('span.message-subject').lastChild;
             var href = commit_text.href;
             commit_text = commit_text.innerHTML;
             //create commit object
@@ -40,7 +50,7 @@ btn_generate.onclick = function(element) {
     };
 
     chrome.tabs.executeScript({
-        code: '(' + extractDOM + ')();'
+        code: '(' + extractDOM + ')(' + value + ');'
     }, function(results) {
         var json_received = results[0];
         var json_obj = JSON.parse(json_received);
@@ -64,4 +74,4 @@ btn_generate.onclick = function(element) {
         }
         document.querySelector('#list-items').appendChild(ol);
     });
-};
+}
